@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Localidad {
+  id          Int          @id @default(autoincrement())
+  codPostal   Int
+  nombre      String
+  direcciones Direccion[]
+}
+
+model Formato {
+  id     Int    @id @default(autoincrement())
+  nombre String
+  sala  Sala[]
+}
+
+model Direccion {
+  id          Int    @id @default(autoincrement())
+  calle       String
+  numero      Int
+  localidadId Int
+  cineId      Int
+  localidad   Localidad @relation(fields: [localidadId], references: [id])
+  cine        Cine      @relation(fields: [cineId], references: [id], onDelete: Cascade)
+}
+
+model Cine {
+  id          Int          @id @default(autoincrement())
+  nombre      String
+  direccion   Direccion[]
+  entradas    EntradaPrecio[]
+  salas       Sala[]
+}
+
+model Turno {
+  id          Int          @id @default(autoincrement())
+  descripcion String
+  entradas    EntradaPrecio[]
+}
+
+model EntradaPrecio {
+  id      Int     @id @default(autoincrement())
+  precio  Float
+  cineId  Int
+  turnoId Int
+  cine    Cine    @relation(fields: [cineId], references: [id], onDelete: Cascade)
+  turno   Turno   @relation(fields: [turnoId], references: [id])
+}
+
+model Sala {
+  id        Int     @id @default(autoincrement())
+  numero    Int
+  capacidad Int
+  formatoId Int
+  cineId    Int
+  formato   Formato @relation(fields: [formatoId], references: [id])
+  cine      Cine    @relation(fields: [cineId], references: [id], onDelete: Cascade)
+}
